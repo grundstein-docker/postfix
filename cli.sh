@@ -22,9 +22,21 @@ function run() {
 
   docker run \
     --detach \
-    --name ${CONTAINER_NAME} \
+    --name $CONTAINER_NAME \
     --volume $DATA_DIR/postfix/data:/home/postfix/ \
+    --publish 25:25 \
+    --env maildomain=mail.wiznwit.com \
+    --env smtp_user=$EMAILS \
     $CONTAINER_NAME
+
+  # docker run \
+  # --name $CONTAINER_NAME \
+  # --publish 587:587 \
+  # --detach \
+  # --env maildomain=mail.wiznwit.com \
+  # --env smtp_user=user:pwd \
+  # --volume /path/to/certs:/etc/postfix/certs \
+  # $CONTAINER_NAME
 
   ip
 
