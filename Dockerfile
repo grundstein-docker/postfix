@@ -9,24 +9,13 @@ ENV REFRESHED_AT 2016-29-03
 RUN echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
     && apk update
 
-RUN apk add curl "postgresql@edge>9.4" "postgresql-contrib@edge>9.4" \
-    && mkdir /docker-entrypoint-initdb.d \
-    && curl \
-        -o /usr/local/bin/gosu \
-        -sSL "https://github.com/tianon/gosu/releases/download/1.2/gosu-amd64" \
-    && chmod +x /usr/local/bin/gosu \
-    && apk del curl \
+RUN apk add postfix supervisor cyrus-sasl bash \
     && rm -rf /var/cache/apk/*
 
-ARG PORT
-ARG PGDATA
+# Add files
+COPY assets/install.sh /opt/install.sh
 
-VOLUME ${PGDATA}
+COPY assets/supervisord.conf /etc/supervisor/supervisord.conf
 
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-
-EXPOSE ${PORT}
-
-CMD ["postgres"]
+# Run
+CMD /opt/install.sh;/usr/bin/supervisord -c /etc/supervisor/supervisord.conf
